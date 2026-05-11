@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+
+# Virtual environment
+venv/
+cnn_env/
+env/
+
+# Data files — too large for git
+data/raw/
+data/processed/
+data/external/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Results and model weights
+results/
+models/trained_weights/
+
+# System
+.DS_Store
+*.log
