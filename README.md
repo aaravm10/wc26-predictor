@@ -13,6 +13,7 @@ Full architecture breakdown in `docs/ARCHITECTURE.md`
 5. **Output** — win probabilities per team, most likely bracket
 
 ## Repo Structure
+```
 wc26-predictor/
 ├── data/
 │   ├── raw/          ← downloaded datasets, gitignored
@@ -28,6 +29,7 @@ wc26-predictor/
 ├── tests/            ← unit tests for each module
 ├── docs/             ← architecture and technical docs
 └── results/          ← simulation outputs, gitignored
+```
 
 ## Setup
 
