@@ -33,7 +33,7 @@ wc26-predictor/
 
 ## Data
 
-### Tier 1 — Current Focus
+### Tier 1 — Current Focus (check https://github.com/aaravm10/wc26-predictor/blob/main/data/DATA_SOURCES.md for more info)
 - [ ] Historical match results — Kaggle *International Football Results 1872-2026*
   - files needed: `results.csv`, `shootouts.csv`, `goalscorers.csv`, `former_names.csv`
 - [ ] FIFA rankings history — Kaggle or FIFA website
