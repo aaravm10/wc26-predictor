@@ -1,3 +1,24 @@
+## How To Contribute
+
+```bash
+# 1. Pull latest changes from main
+git pull origin main
+
+# 2. Create a new branch for your work
+git checkout -b feat/your-feature-name
+
+# 3. Make your changes, then stage and commit
+git add .
+git commit -m "feat: describe what you did"
+
+# 4. Push your branch to GitHub
+git push origin feat/your-feature-name
+
+# 5. Go to GitHub and open a Pull Request to merge into main
+```
+
+Branch naming: `feat/` for new features, `fix/` for bugs, `data/` for data work, `docs/` for documentation.
+
 # wc26-predictor
 A data-driven 2026 FIFA World Cup prediction system using an ensemble of Elo ratings, XGBoost, and a Neural Network, combined with a Monte Carlo tournament simulator.
 
