@@ -31,6 +31,33 @@ wc26-predictor/
 └── results/          ← simulation outputs, gitignored
 ```
 
+## Data
+
+### Tier 1 — Current Focus
+- [ ] Historical match results — Kaggle *International Football Results 1872-2026*
+  - files needed: `results.csv`, `shootouts.csv`, `goalscorers.csv`, `former_names.csv`
+- [ ] FIFA rankings history — Kaggle or FIFA website
+- [ ] 2026 World Cup fixture list — included in dataset above
+
+### Next Steps
+- **Tier 2** — player level data: current season club stats, squad composition, 
+  star players, injuries (FBref, FIFA 25 ratings)
+- **Tier 3** — qualitative data: team chemistry, momentum, betting odds, 
+  tournament DNA, crowd advantage
+
+---
+
+## Models
+
+Three models run in parallel and are combined via a weighted ensemble:
+
+- **Elo** — core baseline, rating per team updated after every historical match, 
+  difference in ratings maps to win probability
+- **XGBoost** — gradient boosted tree model incorporating all engineered features
+- **Neural Network** — feedforward network outputting win/draw/loss probabilities
+
+Ensemble combines all three via weighted average, weights tuned on 2018 World Cup.
+
 ## Setup
 
 ```bash
