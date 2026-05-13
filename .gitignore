@@ -24,3 +24,6 @@ models/trained_weights/
 # System
 .DS_Store
 *.log
+
+# mcps
+.cursor/mcp.json
