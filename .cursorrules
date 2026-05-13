@@ -1,0 +1,43 @@
+This is a FIFA 2026 World Cup prediction project built in Python.
+
+Project structure:
+- src/data/ — data loading and cleaning
+- src/features/ — feature engineering
+- src/models/ — elo, xgboost, neural network, ensemble
+- src/simulation/ — tournament simulator
+- src/evaluation/ — validation
+- tests/ — unit tests for each module
+
+Coding standards:
+- All functions must have docstrings
+- All modules must have corresponding unit tests in tests/
+- Use pandas for data manipulation
+- Use numpy for numerical operations
+- Team names must be standardized using clean_team_name() before any join
+- Raw data in data/raw/ is never modified
+
+Data notes:
+- Primary match dataset: results.csv (home_team, away_team columns)
+- Rankings dataset: fifa_rankings.csv (team column)
+- Team names have unicode issues and inconsistencies across files
+- All team name standardization handled in src/data/collect.py
+
+Commenting standards:
+- Every function must have a docstring explaining: what it does, 
+  args, and return value. Use this format:
+
+  def function_name(arg1, arg2):
+      """
+      Brief description of what the function does.
+      
+      Args:
+          arg1: description
+          arg2: description
+          
+      Returns:
+          description of return value
+      """
+
+- Inline comments for anything non-obvious, not for obvious code
+- Every file must have a top level comment explaining its purpose
+- No commented out dead code — delete it instead
