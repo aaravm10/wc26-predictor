@@ -41,3 +41,10 @@ Commenting standards:
 - Inline comments for anything non-obvious, not for obvious code
 - Every file must have a top level comment explaining its purpose
 - No commented out dead code — delete it instead
+
+When completing any coding task:
+1. Always write tests in tests/ alongside the implementation
+2. Run pytest after writing code and fix any failures before finishing
+3. Never modify files in data/raw/
+4. Always use clean_team_names() before any dataframe join
+5. Follow the docstring format specified in these rules
