@@ -45,7 +45,6 @@ wc26-predictor/
 - **Tier 3** — qualitative data: team chemistry, momentum, betting odds, 
   tournament DNA, crowd advantage
 
----
 
 ## Models
 
