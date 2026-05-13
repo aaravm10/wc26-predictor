@@ -7,7 +7,14 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from src.data.collect import TEAM_NAME_MAPPING, clean_team_names
+from src.data.collect import (
+    TEAM_NAME_MAPPING,
+    clean_team_names,
+    load_goalscorers,
+    load_rankings,
+    load_results,
+    load_shootouts,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,3 +68,76 @@ def test_clean_team_names_idempotent_on_fifa_and_results_samples() -> None:
     for raw in samples:
         once = clean_team_names(raw)
         assert clean_team_names(once) == once
+
+
+def test_load_results() -> None:
+    path = REPO_ROOT / "data/raw/results.csv"
+    if not path.is_file():
+        pytest.skip(f"missing fixture: {path}")
+    raw = _load_raw_csv("data/raw/results.csv")
+    df = load_results()
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == len(raw)
+    assert df["home_team"].equals(raw["home_team"].map(clean_team_names))
+    assert df["away_team"].equals(raw["away_team"].map(clean_team_names))
+
+
+def test_load_shootouts() -> None:
+    path = REPO_ROOT / "data/raw/shootouts.csv"
+    if not path.is_file():
+        pytest.skip(f"missing fixture: {path}")
+    raw = _load_raw_csv("data/raw/shootouts.csv")
+    df = load_shootouts()
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == len(raw)
+    for col in ("home_team", "away_team", "winner"):
+        assert df[col].equals(raw[col].map(clean_team_names))
+
+
+def test_load_goalscorers() -> None:
+    path = REPO_ROOT / "data/raw/goalscorers.csv"
+    if not path.is_file():
+        pytest.skip(f"missing fixture: {path}")
+    raw = _load_raw_csv("data/raw/goalscorers.csv")
+    df = load_goalscorers()
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == len(raw)
+    for col in ("home_team", "away_team", "team"):
+        assert df[col].equals(raw[col].map(clean_team_names))
+
+
+def test_load_rankings() -> None:
+    path = REPO_ROOT / "data/raw/fifa_rankings.csv"
+    if not path.is_file():
+        pytest.skip(f"missing fixture: {path}")
+    raw = _load_raw_csv("data/raw/fifa_rankings.csv")
+    df = load_rankings()
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == len(raw)
+    assert df["team"].equals(raw["team"].map(clean_team_names))
+    assert str(df["date"].dtype).startswith("datetime")
+    assert df["date"].notna().all()
+
+
+def test_load_results_file_not_found() -> None:
+    missing = REPO_ROOT / "data/raw/__definitely_missing_results__.csv"
+    with pytest.raises(FileNotFoundError, match="Required data file not found"):
+        load_results(missing)
+
+
+def test_load_rankings_file_not_found() -> None:
+    missing = REPO_ROOT / "data/raw/__definitely_missing_rankings__.csv"
+    with pytest.raises(FileNotFoundError, match="Required data file not found"):
+        load_rankings(missing)
+
+
+def test_load_shootouts_file_not_found() -> None:
+    missing = REPO_ROOT / "data/raw/__definitely_missing_shootouts__.csv"
+    with pytest.raises(FileNotFoundError, match="Required data file not found"):
+        load_shootouts(missing)
+
+
+def test_load_goalscorers_file_not_found() -> None:
+    missing = REPO_ROOT / "data/raw/__definitely_missing_goalscorers__.csv"
+    with pytest.raises(FileNotFoundError, match="Required data file not found"):
+        load_goalscorers(missing)
