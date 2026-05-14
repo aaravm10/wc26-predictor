@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import unicodedata
+from pathlib import Path
 from typing import Final
+
+import pandas as pd
 
 # Align FIFA ranking CSV labels with `data/raw/results.csv` spellings.
 # Keys are compared after `_normalize_unicode` (NFKC, NBSP→space, strip, collapse spaces).
@@ -85,3 +88,139 @@ def clean_team_names(name: object) -> str:
         prev = s
         s = TEAM_NAME_MAPPING.get(s, s)
     return s
+
+
+def _default_raw_path(filename: str) -> Path:
+    """Resolve ``data/raw/<filename>`` under the repository root (parent of ``src``)."""
+    return Path(__file__).resolve().parents[2] / "data" / "raw" / filename
+
+
+def _resolve_csv_path(path: str | Path | None, default_filename: str) -> Path:
+    if path is None:
+        return _default_raw_path(default_filename)
+    return Path(path).expanduser().resolve()
+
+
+def _read_raw_csv(csv_path: Path) -> pd.DataFrame:
+    if not csv_path.is_file():
+        raise FileNotFoundError(
+            f"Required data file not found: {csv_path}. "
+            "Place CSVs under data/raw/ (see data/DATA_SOURCES.md)."
+        )
+    df = pd.read_csv(csv_path, skipinitialspace=True)
+    df.columns = df.columns.str.strip()
+    return df
+
+
+def load_results(path: str | Path | None = None) -> pd.DataFrame:
+    """
+    Load international match results and normalize team labels.
+
+    Parameters
+    ----------
+    path
+        Filesystem path to ``results.csv``. If ``None``, loads
+        ``<repository root>/data/raw/results.csv``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Raw results with ``home_team`` and ``away_team`` transformed by
+        :func:`clean_team_names`.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the CSV does not exist at the resolved path.
+    """
+    csv_path = _resolve_csv_path(path, "results.csv")
+    df = _read_raw_csv(csv_path)
+    for col in ("home_team", "away_team"):
+        df[col] = df[col].map(clean_team_names)
+    return df
+
+
+def load_shootouts(path: str | Path | None = None) -> pd.DataFrame:
+    """
+    Load penalty shootout records and normalize team labels.
+
+    Parameters
+    ----------
+    path
+        Filesystem path to ``shootouts.csv``. If ``None``, loads
+        ``<repository root>/data/raw/shootouts.csv``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Shootouts with ``home_team``, ``away_team``, and ``winner`` passed through
+        :func:`clean_team_names`.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the CSV does not exist at the resolved path.
+    """
+    csv_path = _resolve_csv_path(path, "shootouts.csv")
+    df = _read_raw_csv(csv_path)
+    for col in ("home_team", "away_team", "winner"):
+        df[col] = df[col].map(clean_team_names)
+    return df
+
+
+def load_goalscorers(path: str | Path | None = None) -> pd.DataFrame:
+    """
+    Load goalscorer lines and normalize team labels.
+
+    Parameters
+    ----------
+    path
+        Filesystem path to ``goalscorers.csv``. If ``None``, loads
+        ``<repository root>/data/raw/goalscorers.csv``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Goal events with ``home_team``, ``away_team``, and ``team`` passed through
+        :func:`clean_team_names`.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the CSV does not exist at the resolved path.
+    """
+    csv_path = _resolve_csv_path(path, "goalscorers.csv")
+    df = _read_raw_csv(csv_path)
+    for col in ("home_team", "away_team", "team"):
+        df[col] = df[col].map(clean_team_names)
+    return df
+
+
+def load_rankings(path: str | Path | None = None) -> pd.DataFrame:
+    """
+    Load FIFA ranking history and normalize the team column.
+
+    Parameters
+    ----------
+    path
+        Filesystem path to ``fifa_rankings.csv``. If ``None``, loads
+        ``<repository root>/data/raw/fifa_rankings.csv``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Rankings with ``team`` passed through :func:`clean_team_names` and ``date``
+        parsed to pandas datetime. The CSV mixes ISO dates (``YYYY-MM-DD``) and
+        US-style dates (``M/D/YYYY``); ``format="mixed"`` is used so both parse
+        correctly (invalid values become ``NaT``).
+
+    Raises
+    ------
+    FileNotFoundError
+        If the CSV does not exist at the resolved path.
+    """
+    csv_path = _resolve_csv_path(path, "fifa_rankings.csv")
+    df = _read_raw_csv(csv_path)
+    df["team"] = df["team"].map(clean_team_names)
+    df["date"] = pd.to_datetime(df["date"], errors="coerce", format="mixed")
+    return df
