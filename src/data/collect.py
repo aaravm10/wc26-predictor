@@ -112,6 +112,14 @@ def _read_raw_csv(csv_path: Path) -> pd.DataFrame:
     return df
 
 
+def _strip_string_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Strip trailing/leading whitespace from all string columns."""
+    str_cols = df.select_dtypes(include=["object", "string"]).columns
+    for col in str_cols:
+        df[col] = df[col].astype(str).str.strip()
+    return df
+
+
 def load_results(path: str | Path | None = None) -> pd.DataFrame:
     """
     Load international match results and normalize team labels.
@@ -135,6 +143,7 @@ def load_results(path: str | Path | None = None) -> pd.DataFrame:
     """
     csv_path = _resolve_csv_path(path, "results.csv")
     df = _read_raw_csv(csv_path)
+    df = _strip_string_columns(df)
     for col in ("home_team", "away_team"):
         df[col] = df[col].map(clean_team_names)
     return df
@@ -163,6 +172,7 @@ def load_shootouts(path: str | Path | None = None) -> pd.DataFrame:
     """
     csv_path = _resolve_csv_path(path, "shootouts.csv")
     df = _read_raw_csv(csv_path)
+    df = _strip_string_columns(df)
     for col in ("home_team", "away_team", "winner"):
         df[col] = df[col].map(clean_team_names)
     return df
@@ -191,6 +201,7 @@ def load_goalscorers(path: str | Path | None = None) -> pd.DataFrame:
     """
     csv_path = _resolve_csv_path(path, "goalscorers.csv")
     df = _read_raw_csv(csv_path)
+    df = _strip_string_columns(df)
     for col in ("home_team", "away_team", "team"):
         df[col] = df[col].map(clean_team_names)
     return df
@@ -221,6 +232,7 @@ def load_rankings(path: str | Path | None = None) -> pd.DataFrame:
     """
     csv_path = _resolve_csv_path(path, "fifa_rankings.csv")
     df = _read_raw_csv(csv_path)
+    df = _strip_string_columns(df)
     df["team"] = df["team"].map(clean_team_names)
     df["date"] = pd.to_datetime(df["date"], errors="coerce", format="mixed")
     return df
