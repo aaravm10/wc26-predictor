@@ -28,6 +28,11 @@ def _load_raw_csv(relative: str) -> pd.DataFrame:
     return df
 
 
+def _expected_cleaned_series(raw: pd.Series) -> pd.Series:
+    """Mirror loader behavior: strip whitespace, then clean team names."""
+    return raw.astype(str).str.strip().map(clean_team_names)
+
+
 def test_clean_team_names_fifa_vocabulary_matches_results_after_cleaning() -> None:
     """
     Every team label that appears in FIFA rankings maps, after cleaning, to a label
@@ -78,8 +83,8 @@ def test_load_results() -> None:
     df = load_results()
     assert isinstance(df, pd.DataFrame)
     assert len(df) == len(raw)
-    assert df["home_team"].equals(raw["home_team"].map(clean_team_names))
-    assert df["away_team"].equals(raw["away_team"].map(clean_team_names))
+    assert df["home_team"].equals(_expected_cleaned_series(raw["home_team"]))
+    assert df["away_team"].equals(_expected_cleaned_series(raw["away_team"]))
 
 
 def test_load_shootouts() -> None:
@@ -91,7 +96,7 @@ def test_load_shootouts() -> None:
     assert isinstance(df, pd.DataFrame)
     assert len(df) == len(raw)
     for col in ("home_team", "away_team", "winner"):
-        assert df[col].equals(raw[col].map(clean_team_names))
+        assert df[col].equals(_expected_cleaned_series(raw[col]))
 
 
 def test_load_goalscorers() -> None:
@@ -103,7 +108,7 @@ def test_load_goalscorers() -> None:
     assert isinstance(df, pd.DataFrame)
     assert len(df) == len(raw)
     for col in ("home_team", "away_team", "team"):
-        assert df[col].equals(raw[col].map(clean_team_names))
+        assert df[col].equals(_expected_cleaned_series(raw[col]))
 
 
 def test_load_rankings() -> None:
@@ -114,7 +119,7 @@ def test_load_rankings() -> None:
     df = load_rankings()
     assert isinstance(df, pd.DataFrame)
     assert len(df) == len(raw)
-    assert df["team"].equals(raw["team"].map(clean_team_names))
+    assert df["team"].equals(_expected_cleaned_series(raw["team"]))
     assert str(df["date"].dtype).startswith("datetime")
     assert df["date"].notna().all()
 
